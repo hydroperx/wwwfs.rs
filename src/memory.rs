@@ -85,6 +85,28 @@ impl crate::DirectoryHandle for DirectoryHandle {
         Ok(())
     }
 
+    async fn remove_entry_with_options(
+        &mut self,
+        name: &str,
+        options: &crate::FileSystemRemoveOptions,
+    ) -> Result<(), Self::Error> {
+        let mut directory = self.0.borrow_mut();
+        
+        if let Some(entry) = directory.get(name) {
+            match entry {
+                DirectoryEntry::Directory(dir) if !options.recursive => {
+                    if !dir.0.borrow().is_empty() {
+                        return Err(format!("Directory '{}' is not empty", name));
+                    }
+                }
+                _ => {}
+            }
+        }
+        
+        directory.remove(name);
+        Ok(())
+    }
+
     async fn entries(
         &self,
     ) -> Result<impl Stream<Item = Result<(String, DirectoryEntry), Self::Error>>, Self::Error>

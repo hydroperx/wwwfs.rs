@@ -94,6 +94,28 @@ impl crate::DirectoryHandle for DirectoryHandle {
         Ok(())
     }
 
+    async fn remove_entry_with_options(
+        &mut self,
+        name: &str,
+        options: &crate::FileSystemRemoveOptions,
+    ) -> Result<(), Self::Error> {
+        let mut path = self.0.clone();
+        path.push(name);
+
+        let metadata = tokio::fs::metadata(&path).await?;
+        if metadata.is_file() {
+            tokio::fs::remove_file(&path).await?;
+        } else if metadata.is_dir() {
+            if options.recursive {
+                tokio::fs::remove_dir_all(&path).await?;
+            } else {
+                tokio::fs::remove_dir(&path).await?;
+            }
+        }
+
+        Ok(())
+    }
+
     async fn entries(
         &self,
     ) -> Result<impl Stream<Item = Result<(String, DirectoryEntry), Self::Error>>, Self::Error>

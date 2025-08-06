@@ -75,6 +75,10 @@ pub struct CreateWritableOptions {
     pub keep_existing_data: bool,
 }
 
+pub struct FileSystemRemoveOptions {
+    pub recursive: bool,
+}
+
 #[derive(Debug, Clone)]
 pub enum DirectoryEntry<Directory, File> {
     File(File),
@@ -100,6 +104,12 @@ pub trait DirectoryHandle: Debug + Sized + private::Sealed {
     fn remove_entry(
         &mut self,
         name: &str,
+    ) -> impl std::future::Future<Output = Result<(), Self::Error>>;
+
+    fn remove_entry_with_options(
+        &mut self,
+        name: &str,
+        options: &FileSystemRemoveOptions,
     ) -> impl std::future::Future<Output = Result<(), Self::Error>>;
 
     #[allow(clippy::type_complexity)] // not sure how to improve this

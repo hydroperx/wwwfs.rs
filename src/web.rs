@@ -5,7 +5,7 @@ use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_futures::{JsFuture, stream::JsStream};
 use web_sys::{
     FileSystemCreateWritableOptions, FileSystemDirectoryHandle, FileSystemFileHandle,
-    FileSystemGetFileOptions, FileSystemWritableFileStream,
+    FileSystemGetFileOptions, FileSystemRemoveOptions, FileSystemWritableFileStream,
 };
 
 type DirectoryEntry = crate::DirectoryEntry<DirectoryHandle, FileHandle>;
@@ -84,6 +84,17 @@ impl crate::DirectoryHandle for DirectoryHandle {
 
     async fn remove_entry(&mut self, name: &str) -> Result<(), Self::Error> {
         JsFuture::from(self.0.remove_entry(name)).await?;
+        Ok(())
+    }
+
+    async fn remove_entry_with_options(
+        &mut self,
+        name: &str,
+        options: &crate::FileSystemRemoveOptions,
+    ) -> Result<(), Self::Error> {
+        let fs_options = FileSystemRemoveOptions::new();
+        fs_options.set_recursive(options.recursive);
+        JsFuture::from(self.0.remove_entry_with_options(name, &fs_options)).await?;
         Ok(())
     }
 
