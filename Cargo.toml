@@ -1,6 +1,6 @@
 [package]
 name = "hydroperx-wwwfs"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2024"
 repository = "https://github.com/anchpop/opfs.git"
 license = "MIT"
@@ -17,6 +17,7 @@ js-sys = "0.3"
 web-sys = { version = "0.3.77", features = [
     "Storage",
     "Window",
+    "FileSystemHandle",
     "FileSystemDirectoryHandle",
     "FileSystemFileHandle",
     "FileSystemWritableFileStream",

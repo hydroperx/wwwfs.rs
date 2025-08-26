@@ -133,6 +133,16 @@ impl From<web_sys::FileList> for FileList {
 }
 
 impl DirectoryHandle {
+    /// Entry name (last portion of the path).
+    pub fn name(&self) -> String {
+        self.0.name()
+    }
+
+    /// Determines if two directory entries are equal.
+    pub async fn eq(&self, other: &Self) -> bool {
+        map_io_result(JsFuture::from(self.0.is_same_entry(&other.0.clone().dyn_into().unwrap())).await).unwrap().is_truthy()
+    }
+
     pub async fn get_file_handle(&self, name: &str) -> std::io::Result<FileHandle> {
         self.get_file_handle_with_options(name, &Default::default()).await
     }
@@ -224,6 +234,16 @@ impl DirectoryHandle {
 }
 
 impl FileHandle {
+    /// Filename.
+    pub fn name(&self) -> String {
+        self.0.name()
+    }
+
+    /// Determines if two file entries are equal.
+    pub async fn eq(&self, other: &Self) -> bool {
+        map_io_result(JsFuture::from(self.0.is_same_entry(&other.0.clone().dyn_into().unwrap())).await).unwrap().is_truthy()
+    }
+
     pub async fn create_writable(&mut self) -> std::io::Result<WritableFileStream> {
         self.create_writable_with_options(&Default::default()).await
     }
